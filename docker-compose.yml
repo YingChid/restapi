@@ -1,5 +1,4 @@
-version: '3.8' # specify docker-compose version
-# Define the services/containers to be run
+version: '3.8'
 services:
     database:
         image: mongo
@@ -8,8 +7,8 @@ services:
             - "27017:27017"
         networks:
             - backend
-    server: #name of the second service
-        build: . # specify the directory of the Dockerfile
+    server:
+        build: .
         container_name: server
         ports:
             - 80:3000
