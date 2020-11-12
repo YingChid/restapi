@@ -28,10 +28,6 @@ router.get('/employees/:id', async (req, res, next) => {
 
 router.post('/employees', validateDate, async (req, res, next) => {
   try {
-    if (new Date(req.body.birthday).toDateString() === "Invalid Date") {
-      return res.status(400).json({ message: "Bad Request shoud check your request body" });
-    }
-
     var emplyeeNew = new Empoloyee ({
       firstname: req.body.firstname,
       lastname: req.body.lastname,
@@ -49,7 +45,11 @@ router.post('/employees', validateDate, async (req, res, next) => {
 router.put('/employees/:id', validateDate, async (req, res, next) => {
 
   await employeeController.update(req.params.id, req.body).then((r) => {
-    res.status(200).json(r)
+    if(r && r.nModified == 1) {
+      res.status(200).json(r)
+    } else {
+      res.status(400).json({message: "Employee not found."})
+    }
   }).catch(err => {
     res.status(400).json(err.message)
   }) ;
@@ -57,14 +57,18 @@ router.put('/employees/:id', validateDate, async (req, res, next) => {
 
 router.delete('/employees/:id', async (req, res, next) => {
   await employeeController.delete(req.params.id).then((r) => {
-    res.status(200).json(r)
+    if(r && r.deletedCount == 1) {
+      res.status(200).json(r)
+    } else {
+      res.status(400).json({message: "Employee not found."})
+    }
   }).catch(err => {
     res.status(400).json(err.message)
   }) ;
 });
 
 function validateDate(req, res, next) {
-  if (new Date(req.body.birthday).toDateString() === "Invalid Date") {
+  if (req.body.birthday && new Date(req.body.birthday).toDateString() === "Invalid Date") {
     return res.status(400).json({ message: "Bad Request shoud check your request body" });
   }
   next();
