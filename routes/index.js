@@ -19,10 +19,9 @@ router.get('/employees/:id', async (req, res, next) => {
   res.status(200).json(result);
 });
 
-router.post('/employees', async (req, res, next) => {
+router.post('/employees', validateDate, async (req, res, next) => {
   try {
-    if (typeof (new Date(req.body.birthday)) === 'object') {
-      // custom application error
+    if (new Date(req.body.birthday).toDateString() === "Invalid Date") {
       return res.status(400).json({ message: "Bad Request shoud check your request body" });
     }
 
@@ -40,8 +39,9 @@ router.post('/employees', async (req, res, next) => {
   }
 });
 
-router.put('/employees/:id', async (req, res, next) => {
-  await employeeController.update(id, req.body).then((r) => {
+router.put('/employees/:id', validateDate, async (req, res, next) => {
+
+  await employeeController.update(req.params.id, req.body).then((r) => {
     res.status(200).json(r)
   }).catch(err => {
     res.status(400).json(err.message)
@@ -49,7 +49,18 @@ router.put('/employees/:id', async (req, res, next) => {
 });
 
 router.delete('/employees/:id', async (req, res, next) => {
-
+  await employeeController.delete(req.params.id).then((r) => {
+    res.status(200).json(r)
+  }).catch(err => {
+    res.status(400).json(err.message)
+  }) ;
 });
+
+function validateDate(req, res, next) {
+  if (new Date(req.body.birthday).toDateString() === "Invalid Date") {
+    return res.status(400).json({ message: "Bad Request shoud check your request body" });
+  }
+  next();
+}
 
 module.exports = router;
