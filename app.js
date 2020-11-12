@@ -5,9 +5,22 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var PORT = 3000
+
+const MONGO_URL = "mongodb://localhost:27017/";
+
+mongoose.connect(MONGO_URL, { poolSize: 10 }).then(
+  () => { console.log(`connected mongodb on ${MONGO_URL}`) },
+  err => {
+    console.error(err)
+    console.log('%s MongoDB connection error. Please make sure MongoDB is running.')
+    process.exit()
+  }
+)
+
 
 var app = express();
 app.use(cors());
