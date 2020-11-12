@@ -10,7 +10,7 @@ var basicAuthen = require('./configs/basic-auth')
 var indexRouter = require('./routes/index');
 var PORT = 3000
 
-const MONGO_URL = "mongodb://localhost:27017/";
+const MONGO_URL = process.env.MONGO_URL|| "mongodb://localhost:27017/";
 
 mongoose.connect(MONGO_URL,  { useNewUrlParser: true }).then(
   () => { console.log(`connected mongodb on ${MONGO_URL}`) },

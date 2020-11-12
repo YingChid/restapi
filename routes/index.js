@@ -15,8 +15,15 @@ router.get('/employees', async (req, res, next) => {
 });
 
 router.get('/employees/:id', async (req, res, next) => {
-  var result = await employeeController.findByID(req.params.id);
-  res.status(200).json(result);
+  await employeeController.findByID(req.params.id).then((r) => {
+    if(r) {
+      res.status(200).json(r)
+    } else {
+      res.status(400).json({message: "Employee not found."})
+    }
+  }).catch(err => {
+    res.status(400).json(err.message)
+  }) ;
 });
 
 router.post('/employees', validateDate, async (req, res, next) => {
