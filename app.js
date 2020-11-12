@@ -6,13 +6,13 @@ var logger = require('morgan');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-
+var basicAuthen = require('./configs/basic-auth')
 var indexRouter = require('./routes/index');
 var PORT = 3000
 
 const MONGO_URL = "mongodb://localhost:27017/";
 
-mongoose.connect(MONGO_URL, { poolSize: 10 }).then(
+mongoose.connect(MONGO_URL,  { useNewUrlParser: true }).then(
   () => { console.log(`connected mongodb on ${MONGO_URL}`) },
   err => {
     console.error(err)
@@ -21,7 +21,6 @@ mongoose.connect(MONGO_URL, { poolSize: 10 }).then(
   }
 )
 
-
 var app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false}));
@@ -29,8 +28,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(basicAuthen);
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
@@ -40,13 +38,13 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  if (typeof (err) === 'string') {
+    // custom application error
+    return res.status(400).json({ message: err });
+  }
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  // default to 500 server error
+  return res.status(500).json({ message: err.message });
 });
 
 app.listen(PORT, () => {

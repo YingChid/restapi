@@ -1,4 +1,4 @@
-var Employee = require('../models/employees')
+var Employee = require('../models/employee')
 
 var employeeController = {
   find: () => {
@@ -9,14 +9,8 @@ var employeeController = {
     return Employee.findOne({'_id': id})
   },
 
-  create: (firstname, lastname, birthday, email) => {
-    let employee = new Employee({
-        firstname: firstname,
-        lastname: lastname,
-        birthday: birthday,
-        email: email,
-    });
-    return Employee.create(employee)
+  create: (employeeNew) => {
+    return Employee.create(employeeNew)
   },
 
   update: (id, employeeNew) => {
